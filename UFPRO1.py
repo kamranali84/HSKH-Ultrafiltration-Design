@@ -18,19 +18,38 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-from ultrapro_ui import vendor_selector, rack_rules     # your existing module/rack data helpers
-import water_chemistry as chem                          # ions / charge balance / pH (water_chemistry.py)
-_missing = [f for f in ("analyze", "auto_balance", "cleaning_demand") if not hasattr(chem, f)]
-if _missing:      # an old copy of water_chemistry.py is in the project folder
-    st.set_page_config(page_title="HSKH Ultrafiltration Design", page_icon="💧", layout="wide")
-    st.error(f"water_chemistry.py is out of date (missing: {', '.join(_missing)}).  Replace it with the latest "
-             f"water_chemistry.py, then restart Streamlit.  File in use: {chem.__file__}")
-    st.stop()
-
+# =====================================================
+# STREAMLIT PAGE CONFIGURATION
+# Must be called once, before any other st.* command
+# =====================================================
 APP_TITLE = "HSKH Ultrafiltration Design"
 
-st.set_page_config(page_title=APP_TITLE, page_icon="💧", layout="wide",
-                   initial_sidebar_state="expanded")      # must be the first Streamlit call
+st.set_page_config(
+    page_title=APP_TITLE,
+    page_icon="💧",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# Local project modules
+from ultrapro_ui import vendor_selector, rack_rules
+import water_chemistry as chem
+
+# Check that water_chemistry.py is up to date
+_missing = [
+    f
+    for f in ("analyze", "auto_balance", "cleaning_demand")
+    if not hasattr(chem, f)
+]
+
+if _missing:
+    st.error(
+        f"water_chemistry.py is out of date "
+        f"(missing: {', '.join(_missing)}). "
+        f"Replace it with the latest water_chemistry.py, "
+        f"then restart Streamlit. File in use: {chem.__file__}"
+    )
+    st.stop()
 
 ss = st.session_state
 
